@@ -1,0 +1,63 @@
+---
+- name: Initialize variables
+  ansible.builtin.set_fact:
+    abclinuxu_weekly_python_venv_dir: "{{ abclinuxu_weekly_base_dir }}/venv"
+    abclinuxu_weekly_src_dir: "{{ abclinuxu_weekly_base_dir }}/src"
+
+- name: Install packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ abclinuxu_weekly_required_packages }}"
+  become: true
+
+- name: Create directory structure
+  ansible.builtin.file:
+    name: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+    - "{{ abclinuxu_weekly_base_dir }}"
+  become: true
+
+- name: Get abclinuxu.weekly from git repo
+  ansible.builtin.git:
+    repo: "https://github.com/zstyblik/abclinuxu.weekly.git"
+    dest: "{{ abclinuxu_weekly_src_dir }}"
+    version: "{{ abclinuxu_weekly_version }}"
+  register: _abclinuxu_weekly_git_clone
+  become: true
+
+- name: "Adjust permissions of {{ abclinuxu_weekly_src_dir }}"
+  ansible.builtin.file:
+    name: "{{ abclinuxu_weekly_src_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Prepare virtualenv for Py dependencies
+  ansible.builtin.pip:
+    name: pip
+    virtualenv: "{{ abclinuxu_weekly_python_venv_dir }}"
+    virtualenv_command: "{{ abclinuxu_weekly_python_path }} -m venv"
+  become: true
+
+- name: Install Python dependencies
+  ansible.builtin.pip:
+    requirements: "{{ abclinuxu_weekly_src_dir }}/requirements.txt"
+    virtualenv: "{{ abclinuxu_weekly_python_venv_dir }}"
+    virtualenv_command: "{{ abclinuxu_weekly_python_path }} -m venv"
+  register: _abclinuxu_weekly_python_deps
+  become: true
+
+# NOTE: Having __pycache__ around may lead to unexpected errors.
+- name: Delete __pycache__
+  ansible.builtin.file:
+    path: "{{ abclinuxu_weekly_src_dir }}/__pycache__"
+    state: absent
+  when: (_abclinuxu_weekly_git_clone.changed) or (_abclinuxu_weekly_python_deps.changed)
+  become: true

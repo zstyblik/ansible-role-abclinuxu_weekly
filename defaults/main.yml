@@ -1,0 +1,8 @@
+---
+abclinuxu_weekly_version: master
+abclinuxu_weekly_required_packages:
+  - git
+  - python3.11-minimal
+  - python3.11-venv
+abclinuxu_weekly_python_path: /usr/bin/python3.11
+abclinuxu_weekly_base_dir: /opt/abclinuxu.weekly
