@@ -29,6 +29,6 @@ jobs:
       run: |
         ./ci/run-yamllint.sh
     - name: Run ansible-lint
-      uses: ansible/ansible-lint@v6.22.2
+      uses: ansible/ansible-lint@v24.7.0
       with:
         working_directory: 'zstyblik.abclinuxu_weekly'
