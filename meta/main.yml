@@ -1,7 +1,9 @@
 ---
 dependencies: []
 galaxy_info:
-  author: zstyblik
+  author: Zdenek Styblik
+  role_name: abclinuxu_weekly
+  namespace: zstyblik
   description: Ansible role for deployment of abclinuxu.weekly
   company: Zdenek Styblik
   license: MIT

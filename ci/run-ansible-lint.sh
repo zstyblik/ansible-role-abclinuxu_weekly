@@ -4,4 +4,4 @@ set -u
 
 cd "$(dirname "${0}")/.."
 
-yamllint -s .
+ansible-lint .
